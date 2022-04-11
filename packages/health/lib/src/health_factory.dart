@@ -386,6 +386,7 @@ class HealthFactory {
       final DateTime to = DateTime.fromMillisecondsSinceEpoch(e['date_to']);
       final String sourceId = e["source_id"];
       final String sourceName = e["source_name"];
+      final num workoutId = e["workout_id"] ?? '';
       final num burnedCalories = e["burned_calories"] ?? 0;
       return HealthDataPoint(
         value,
@@ -397,6 +398,7 @@ class HealthFactory {
         device,
         sourceId,
         sourceName,
+        workoutId,
         burnedCalories,
       );
     }).toList();

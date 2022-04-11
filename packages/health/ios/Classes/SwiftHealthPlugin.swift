@@ -3,7 +3,7 @@ import UIKit
 import HealthKit
 
 public class SwiftHealthPlugin: NSObject, FlutterPlugin {
-    
+
     let healthStore = HKHealthStore()
     var healthDataTypes = [HKSampleType]()
     var heartRateEventTypes = Set<HKSampleType>()
@@ -12,7 +12,7 @@ public class SwiftHealthPlugin: NSObject, FlutterPlugin {
     var dataTypesDict: [String: HKSampleType] = [:]
     var unitDict: [String: HKUnit] = [:]
     var workoutActivityTypeMap: [String: HKWorkoutActivityType] = [:]
-    
+
     // Health Data Type Keys
     let ACTIVE_ENERGY_BURNED = "ACTIVE_ENERGY_BURNED"
     let AUDIOGRAM = "AUDIOGRAM"
@@ -56,7 +56,8 @@ public class SwiftHealthPlugin: NSObject, FlutterPlugin {
     let HEADACHE_MODERATE = "HEADACHE_MODERATE"
     let HEADACHE_SEVERE = "HEADACHE_SEVERE"
     let ELECTROCARDIOGRAM = "ELECTROCARDIOGRAM"
-    
+
+
     // Health Unit types
     // MOLE_UNIT_WITH_MOLAR_MASS, // requires molar mass input - not supported yet
     // MOLE_UNIT_WITH_PREFIX_MOLAR_MASS, // requires molar mass & prefix input - not supported yet
@@ -107,7 +108,7 @@ public class SwiftHealthPlugin: NSObject, FlutterPlugin {
     let MILLIGRAM_PER_DECILITER = "MILLIGRAM_PER_DECILITER"
     let UNKNOWN_UNIT = "UNKNOWN_UNIT"
     let NO_UNIT = "NO_UNIT"
-    
+
     struct PluginError: Error {
         let message: String
     }
@@ -117,11 +118,11 @@ public class SwiftHealthPlugin: NSObject, FlutterPlugin {
         let instance = SwiftHealthPlugin()
         registrar.addMethodCallDelegate(instance, channel: channel)
     }
-    
+
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         // Set up all data types
         initializeTypes()
-        
+
         /// Handle checkIfHealthDataAvailable
         if (call.method.elementsEqual("checkIfHealthDataAvailable")){
             checkIfHealthDataAvailable(call: call, result: result)
@@ -130,38 +131,38 @@ public class SwiftHealthPlugin: NSObject, FlutterPlugin {
         else if (call.method.elementsEqual("requestAuthorization")){
             try! requestAuthorization(call: call, result: result)
         }
-        
+
         /// Handle getData
         else if (call.method.elementsEqual("getData")){
             getData(call: call, result: result)
         }
-        
+
         /// Handle getTotalStepsInInterval
         else if (call.method.elementsEqual("getTotalStepsInInterval")){
             getTotalStepsInInterval(call: call, result: result)
         }
-        
+
         /// Handle writeData
         else if (call.method.elementsEqual("writeData")){
             try! writeData(call: call, result: result)
         }
-        
+
         /// Handle writeAudiogram
         else if (call.method.elementsEqual("writeAudiogram")){
             try! writeAudiogram(call: call, result: result)
         }
-        
+
         /// Handle writeWorkoutData
         else if (call.method.elementsEqual("writeWorkoutData")){
             try! writeWorkoutData(call: call, result: result)
         }
-        
+
         /// Handle hasPermission
         else if (call.method.elementsEqual("hasPermissions")){
             try! hasPermissions(call: call, result: result)
         }
     }
-    
+
     func checkIfHealthDataAvailable(call: FlutterMethodCall, result: @escaping FlutterResult) {
         result(HKHealthStore.isHealthDataAvailable())
     }
@@ -183,10 +184,10 @@ public class SwiftHealthPlugin: NSObject, FlutterPlugin {
                 return
             }
         }
-        
+
         result(true)
     }
-    
+
     
     func hasPermission(type: HKSampleType, access: Int) -> Bool? {
         
@@ -205,7 +206,7 @@ public class SwiftHealthPlugin: NSObject, FlutterPlugin {
             return nil
         }
     }
-    
+
     func requestAuthorization(call: FlutterMethodCall, result: @escaping FlutterResult) throws {
         guard let arguments = call.arguments as? NSDictionary,
               let types = arguments["types"] as? Array<String>,
@@ -231,7 +232,7 @@ public class SwiftHealthPlugin: NSObject, FlutterPlugin {
                 typesToWrite.insert(dataType)
             }
         }
-        
+
         if #available(iOS 13.0, *) {
             healthStore.requestAuthorization(toShare: typesToWrite, read: typesToRead) { (success, error) in
                 DispatchQueue.main.async {
@@ -259,12 +260,12 @@ public class SwiftHealthPlugin: NSObject, FlutterPlugin {
         let dateTo = Date(timeIntervalSince1970: endTime.doubleValue / 1000)
         
         let sample: HKObject
-        
+
         if (unitLookUp(key: type) == HKUnit.init(from: "")) {
             sample = HKCategorySample(type: dataTypeLookUp(key: type) as! HKCategoryType, value: Int(value), start: dateFrom, end: dateTo)
         } else {
             let quantity = HKQuantity(unit: unitDict[unit]!, doubleValue: value)
-            
+
             sample = HKQuantitySample(type: dataTypeLookUp(key: type) as! HKQuantityType, quantity: quantity, start: dateFrom, end: dateTo)
         }
         
@@ -277,7 +278,7 @@ public class SwiftHealthPlugin: NSObject, FlutterPlugin {
             }
         })
     }
-    
+
     func writeAudiogram(call: FlutterMethodCall, result: @escaping FlutterResult) throws {
         guard let arguments = call.arguments as? NSDictionary,
               let frequencies = (arguments["frequencies"] as? Array<Double>),
@@ -288,12 +289,12 @@ public class SwiftHealthPlugin: NSObject, FlutterPlugin {
         else {
             throw PluginError(message: "Invalid Arguments")
         }
-        
+
         let dateFrom = Date(timeIntervalSince1970: startTime.doubleValue / 1000)
         let dateTo = Date(timeIntervalSince1970: endTime.doubleValue / 1000)
-        
+
         var sensitivityPoints = [HKAudiogramSensitivityPoint]()
-        
+
         for index in 0...frequencies.count-1 {
             let frequency = HKQuantity(unit: HKUnit.hertz(), doubleValue: frequencies[index])
             let dbUnit = HKUnit.decibelHearingLevel()
@@ -302,20 +303,20 @@ public class SwiftHealthPlugin: NSObject, FlutterPlugin {
             let sensitivityPoint = try HKAudiogramSensitivityPoint(frequency: frequency,  leftEarSensitivity: left, rightEarSensitivity: right)
             sensitivityPoints.append(sensitivityPoint)
         }
-        
+
         let audiogram: HKAudiogramSample;
         let metadataReceived = (arguments["metadata"] as? [String: Any]?)
-        
+
         if((metadataReceived) != nil) {
             guard let deviceName = metadataReceived?!["HKDeviceName"] as? String else { return }
             guard let externalUUID = metadataReceived?!["HKExternalUUID"] as? String else { return }
-            
+
             audiogram = HKAudiogramSample(sensitivityPoints:sensitivityPoints, start: dateFrom, end: dateTo, metadata: [HKMetadataKeyDeviceName: deviceName, HKMetadataKeyExternalUUID: externalUUID])
-            
+
         } else {
             audiogram = HKAudiogramSample(sensitivityPoints:sensitivityPoints, start: dateFrom, end: dateTo, metadata: nil)
         }
-        
+
         HKHealthStore().save(audiogram, withCompletion: { (success, error) in
             if let err = error {
                 print("Error Saving Audiogram. Sample: \(err.localizedDescription)")
@@ -325,7 +326,7 @@ public class SwiftHealthPlugin: NSObject, FlutterPlugin {
             }
         })
     }
-    
+
     func writeWorkoutData(call: FlutterMethodCall, result: @escaping FlutterResult) throws {
         guard let arguments = call.arguments as? NSDictionary,
               let activityType = (arguments["activityType"] as? String),
@@ -335,10 +336,10 @@ public class SwiftHealthPlugin: NSObject, FlutterPlugin {
         else {
             throw PluginError(message: "Invalid Arguments - ActivityType, startTime or endTime invalid")
         }
-        
+
         var totalEnergyBurned: HKQuantity?
         var totalDistance: HKQuantity? = nil
-        
+
         // Handle optional arguments
         if let teb = (arguments["totalEnergyBurned"] as? Double) {
             totalEnergyBurned = HKQuantity(unit: unitDict[(arguments["totalEnergyBurnedUnit"] as! String)]!, doubleValue: teb)
@@ -346,16 +347,16 @@ public class SwiftHealthPlugin: NSObject, FlutterPlugin {
         if let td = (arguments["totalDistance"] as? Double) {
             totalDistance = HKQuantity(unit: unitDict[(arguments["totalDistanceUnit"] as! String)]!, doubleValue: td)
         }
-        
+
        let dateFrom = Date(timeIntervalSince1970: startTime.doubleValue / 1000)
        let dateTo = Date(timeIntervalSince1970: endTime.doubleValue / 1000)
-        
+
         var workout: HKWorkout
-        
+
         workout = HKWorkout(activityType: ac, start: dateFrom, end: dateTo, duration: dateTo.timeIntervalSince(dateFrom),
                             totalEnergyBurned: totalEnergyBurned ?? nil,
                             totalDistance: totalDistance ?? nil, metadata: nil)
-        
+
         HKHealthStore().save(workout, withCompletion: { (success, error) in
             if let err = error {
                 print("Error Saving Workout. Sample: \(err.localizedDescription)")
@@ -365,7 +366,7 @@ public class SwiftHealthPlugin: NSObject, FlutterPlugin {
             }
         })
     }
-    
+
     func getData(call: FlutterMethodCall, result: @escaping FlutterResult) {
         let arguments = call.arguments as? NSDictionary
         let dataTypeKey = (arguments?["dataTypeKey"] as? String)!
@@ -373,23 +374,23 @@ public class SwiftHealthPlugin: NSObject, FlutterPlugin {
         let startTime = (arguments?["startTime"] as? NSNumber) ?? 0
         let endTime = (arguments?["endTime"] as? NSNumber) ?? 0
         let limit = (arguments?["limit"] as? Int) ?? HKObjectQueryNoLimit
-        
+
         // Convert dates from milliseconds to Date()
         let dateFrom = Date(timeIntervalSince1970: startTime.doubleValue / 1000)
         let dateTo = Date(timeIntervalSince1970: endTime.doubleValue / 1000)
-        
+
         let dataType = dataTypeLookUp(key: dataTypeKey)
-        var unit: HKUnit?
+var unit: HKUnit?
         if let dataUnitKey = dataUnitKey {
             unit = unitDict[dataUnitKey]
         }
-        
+
         let predicate = HKQuery.predicateForSamples(withStart: dateFrom, end: dateTo, options: .strictStartDate)
         let sortDescriptor = NSSortDescriptor(key: HKSampleSortIdentifierEndDate, ascending: false)
-        
+
         let query = HKSampleQuery(sampleType: dataType, predicate: predicate, limit: limit, sortDescriptors: [sortDescriptor]) { [self]
             x, samplesOrNil, error in
-            
+
             switch samplesOrNil {
             case let (samples as [HKQuantitySample]) as Any:
                 let dictionaries = samples.map { sample -> NSDictionary in
@@ -459,14 +460,14 @@ public class SwiftHealthPlugin: NSObject, FlutterPlugin {
                         "date_to": Int(sample.endDate.timeIntervalSince1970 * 1000),
                         "source_id": sample.sourceRevision.source.bundleIdentifier,
                         "source_name": sample.sourceRevision.source.name,
+                        "workout_id": sample.workoutActivityType.rawValue,
                         "burned_calories": sample.totalEnergyBurned?.doubleValue(for: HKUnit.kilocalorie()) ?? 0
                     ]
                 }
-                
-                DispatchQueue.main.async {
+DispatchQueue.main.async {
                     result(dictionaries)
                 }
-                
+
             case let (samplesAudiogram as [HKAudiogramSample]) as Any:
                 let dictionaries = samplesAudiogram.map { sample -> NSDictionary in
                     var frequencies = [Double]()
@@ -491,7 +492,7 @@ public class SwiftHealthPlugin: NSObject, FlutterPlugin {
                 DispatchQueue.main.async {
                     result(dictionaries)
                 }
-                
+
             default:
                 if #available(iOS 14.0, *), let ecgSamples = samplesOrNil as? [HKElectrocardiogram] {
                     let dictionaries = ecgSamples.map(fetchEcgMeasurements)
@@ -505,11 +506,10 @@ public class SwiftHealthPlugin: NSObject, FlutterPlugin {
                 }
             }
         }
-        
+
         HKHealthStore().execute(query)
     }
-    
-    @available(iOS 14.0, *)
+@available(iOS 14.0, *)
     private func fetchEcgMeasurements(_ sample: HKElectrocardiogram) -> NSDictionary {
         let semaphore = DispatchSemaphore(value: 0)
         var voltageValues = [NSDictionary]()
@@ -540,63 +540,63 @@ public class SwiftHealthPlugin: NSObject, FlutterPlugin {
             "source_name": sample.sourceRevision.source.name
         ]
     }
-    
+
     func getTotalStepsInInterval(call: FlutterMethodCall, result: @escaping FlutterResult) {
         let arguments = call.arguments as? NSDictionary
         let startTime = (arguments?["startTime"] as? NSNumber) ?? 0
         let endTime = (arguments?["endTime"] as? NSNumber) ?? 0
-        
+
         // Convert dates from milliseconds to Date()
         let dateFrom = Date(timeIntervalSince1970: startTime.doubleValue / 1000)
         let dateTo = Date(timeIntervalSince1970: endTime.doubleValue / 1000)
-        
+
         let sampleType = HKQuantityType.quantityType(forIdentifier: .stepCount)!
         let predicate = HKQuery.predicateForSamples(withStart: dateFrom, end: dateTo, options: .strictStartDate)
-        
+
         let query = HKStatisticsQuery(quantityType: sampleType,
                                       quantitySamplePredicate: predicate,
                                       options: .cumulativeSum) { query, queryResult, error in
-            
+
             guard let queryResult = queryResult else {
                 let error = error! as NSError
                 print("Error getting total steps in interval \(error.localizedDescription)")
-                
+
                 DispatchQueue.main.async {
                     result(nil)
                 }
                 return
             }
-            
+
             var steps = 0.0
-            
+
             if let quantity = queryResult.sumQuantity() {
                 let unit = HKUnit.count()
                 steps = quantity.doubleValue(for: unit)
             }
-            
+
             let totalSteps = Int(steps)
             DispatchQueue.main.async {
                 result(totalSteps)
             }
         }
-        
+
         HKHealthStore().execute(query)
     }
-    
+
     func unitLookUp(key: String) -> HKUnit {
         guard let unit = unitDict[key] else {
             return HKUnit.count()
         }
         return unit
     }
-    
+
     func dataTypeLookUp(key: String) -> HKSampleType {
         guard let dataType_ = dataTypesDict[key] else {
             return HKSampleType.quantityType(forIdentifier: .bodyMass)!
         }
         return dataType_
     }
-    
+
     func initializeTypes() {
         // Initialize units
         unitDict[GRAM] = HKUnit.gram()
@@ -644,7 +644,7 @@ public class SwiftHealthPlugin: NSObject, FlutterPlugin {
         unitDict[MILLIGRAM_PER_DECILITER] = HKUnit.init(from: "mg/dL")
         unitDict[UNKNOWN_UNIT] = HKUnit.init(from: "")
         unitDict[NO_UNIT] = HKUnit.init(from: "")
-        
+
         // Initialize workout types
         workoutActivityTypeMap["ARCHERY"] = .archery
         workoutActivityTypeMap["BOWLING"] = .bowling
@@ -668,7 +668,7 @@ public class SwiftHealthPlugin: NSObject, FlutterPlugin {
         workoutActivityTypeMap["FLEXIBILITY"] = .flexibility
         workoutActivityTypeMap["WALKING"] = .walking
         workoutActivityTypeMap["RUNNING"] = .running
-        workoutActivityTypeMap["RUNNING_JOGGING"] = .running // Supported due to combining with Android naming 
+        workoutActivityTypeMap["RUNNING_JOGGING"] = .running // Supported due to combining with Android naming
         workoutActivityTypeMap["RUNNING_SAND"] = .running // Supported due to combining with Android naming
         workoutActivityTypeMap["RUNNING_TREADMILL"] = .running // Supported due to combining with Android naming
         workoutActivityTypeMap["WHEELCHAIR_WALK_PACE"] = .wheelchairWalkPace
@@ -727,9 +727,9 @@ public class SwiftHealthPlugin: NSObject, FlutterPlugin {
         workoutActivityTypeMap["TAI_CHI"] = .taiChi
         workoutActivityTypeMap["WRESTLING"] = .wrestling
         workoutActivityTypeMap["OTHER"] = .other
-        
-        
-        
+
+
+
         // Set up iOS 13 specific types (ordinary health data types)
         if #available(iOS 13.0, *) {
             dataTypesDict[ACTIVE_ENERGY_BURNED] = HKSampleType.quantityType(forIdentifier: .activeEnergyBurned)!
@@ -765,7 +765,7 @@ public class SwiftHealthPlugin: NSObject, FlutterPlugin {
             dataTypesDict[SLEEP_AWAKE] = HKSampleType.categoryType(forIdentifier: .sleepAnalysis)!
             dataTypesDict[EXERCISE_TIME] = HKSampleType.quantityType(forIdentifier: .appleExerciseTime)!
             dataTypesDict[WORKOUT] = HKSampleType.workoutType()
-            
+
             healthDataTypes = Array(dataTypesDict.values)
         }
         // Set up heart rate data types specific to the apple watch, requires iOS 12
@@ -773,38 +773,38 @@ public class SwiftHealthPlugin: NSObject, FlutterPlugin {
             dataTypesDict[HIGH_HEART_RATE_EVENT] = HKSampleType.categoryType(forIdentifier: .highHeartRateEvent)!
             dataTypesDict[LOW_HEART_RATE_EVENT] = HKSampleType.categoryType(forIdentifier: .lowHeartRateEvent)!
             dataTypesDict[IRREGULAR_HEART_RATE_EVENT] = HKSampleType.categoryType(forIdentifier: .irregularHeartRhythmEvent)!
-            
+
             heartRateEventTypes =  Set([
                 HKSampleType.categoryType(forIdentifier: .highHeartRateEvent)!,
                 HKSampleType.categoryType(forIdentifier: .lowHeartRateEvent)!,
                 HKSampleType.categoryType(forIdentifier: .irregularHeartRhythmEvent)!,
             ])
         }
-        
+
         if #available(iOS 13.6, *){
             dataTypesDict[HEADACHE_UNSPECIFIED] = HKSampleType.categoryType(forIdentifier: .headache)!
             dataTypesDict[HEADACHE_NOT_PRESENT] = HKSampleType.categoryType(forIdentifier: .headache)!
             dataTypesDict[HEADACHE_MILD] = HKSampleType.categoryType(forIdentifier: .headache)!
             dataTypesDict[HEADACHE_MODERATE] = HKSampleType.categoryType(forIdentifier: .headache)!
             dataTypesDict[HEADACHE_SEVERE] = HKSampleType.categoryType(forIdentifier: .headache)!
-            
+
             headacheType = Set([
                 HKSampleType.categoryType(forIdentifier: .headache)!,
             ])
         }
-        
+
         if #available(iOS 14.0, *) {
             dataTypesDict[ELECTROCARDIOGRAM] = HKSampleType.electrocardiogramType()
-            
+
             unitDict[VOLT] = HKUnit.volt()
             unitDict[INCHES_OF_MERCURY] = HKUnit.inchesOfMercury()
-            
+
             workoutActivityTypeMap["CARDIO_DANCE"] = HKWorkoutActivityType.cardioDance
             workoutActivityTypeMap["SOCIAL_DANCE"] = HKWorkoutActivityType.socialDance
             workoutActivityTypeMap["PICKLEBALL"] = HKWorkoutActivityType.pickleball
             workoutActivityTypeMap["COOLDOWN"] = HKWorkoutActivityType.cooldown
         }
-        
+
         // Concatenate heart events, headache and health data types (both may be empty)
         allDataTypes = Set(heartRateEventTypes + healthDataTypes)
         allDataTypes = allDataTypes.union(headacheType)

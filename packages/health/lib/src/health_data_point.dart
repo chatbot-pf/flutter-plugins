@@ -12,6 +12,7 @@ class HealthDataPoint {
   String _deviceId;
   String _sourceId;
   String _sourceName;
+  num _workoutId;
   num _burnedCalories;
 
   HealthDataPoint(
@@ -24,6 +25,7 @@ class HealthDataPoint {
       this._deviceId,
       this._sourceId,
       this._sourceName,
+      this._workoutId,
       this._burnedCalories) {
     // set the value to minutes rather than the category
     // returned by the native API
@@ -75,6 +77,7 @@ class HealthDataPoint {
         json['device_id'],
         json['source_id'],
         json['source_name'],
+      json['workout_id'],
       json['burned_calories']);
   }
 
@@ -89,6 +92,7 @@ class HealthDataPoint {
         'device_id': deviceId,
         'source_id': sourceId,
         'source_name': sourceName,
+        'workout_id': workoutId,
         'burned_calories': burnedCalories,
       };
 
@@ -101,6 +105,7 @@ class HealthDataPoint {
     dataType: ${type.name},
     platform: $platform,
     burnedCalories: $burnedCalories,
+    workoutId: $workoutId,
     deviceId: $deviceId,
     sourceId: $sourceId,
     sourceName: $sourceName""";
@@ -138,6 +143,8 @@ class HealthDataPoint {
   /// The name of the source from which the data point was fetched.
   String get sourceName => _sourceName;
 
+  num get workoutId => _workoutId;
+
   num get burnedCalories => _burnedCalories;
 
   @override
@@ -151,6 +158,7 @@ class HealthDataPoint {
         this.platform == o.platform &&
         this.deviceId == o.deviceId &&
         this.burnedCalories == o.burnedCalories &&
+        this.workoutId == o.workoutId &&
         this.sourceId == o.sourceId &&
         this.sourceName == o.sourceName;
   }

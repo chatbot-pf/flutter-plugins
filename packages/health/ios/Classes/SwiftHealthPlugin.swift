@@ -300,14 +300,15 @@ public class SwiftHealthPlugin: NSObject, FlutterPlugin {
                         "date_to": Int(sample.endDate.timeIntervalSince1970 * 1000),
                         "source_id": sample.sourceRevision.source.bundleIdentifier,
                         "source_name": sample.sourceRevision.source.name,
+                        "workout_id": sample.workoutActivityType.rawValue,
                         "burned_calories": sample.totalEnergyBurned?.doubleValue(for: HKUnit.kilocalorie()) ?? 0
                     ]
                 }
-                
+
                 DispatchQueue.main.async {
                     result(dictionaries)
                 }
-                
+
             default:
                 DispatchQueue.main.async {
                     result(nil)
@@ -337,7 +338,7 @@ public class SwiftHealthPlugin: NSObject, FlutterPlugin {
             guard let queryResult = queryResult else {
                 let error = error! as NSError
                 print("Error getting total steps in interval \(error.localizedDescription)")
-                
+
                 DispatchQueue.main.async {
                     result(nil)
                 }
@@ -470,7 +471,7 @@ public class SwiftHealthPlugin: NSObject, FlutterPlugin {
             dataTypesDict[HEADACHE_MODERATE] = HKSampleType.categoryType(forIdentifier: .headache)!
             dataTypesDict[HEADACHE_SEVERE] = HKSampleType.categoryType(forIdentifier: .headache)!
 
-            headacheType = Set([ 
+            headacheType = Set([
                 HKSampleType.categoryType(forIdentifier: .headache)!,
             ])
         }

@@ -203,7 +203,9 @@ class HealthFactory {
           _platformType,
           _deviceId!,
           '',
-          '');
+          '',
+          0,
+          0);
 
       bmiHealthPoints.add(x);
     }

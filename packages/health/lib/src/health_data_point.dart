@@ -77,8 +77,8 @@ class HealthDataPoint {
         json['device_id'],
         json['source_id'],
         json['source_name'],
-      json['workout_id'],
-      json['burned_calories']);
+        json['workout_id'],
+        json['burned_calories']);
   }
 
   /// Converts the [HealthDataPoint] to a json object
@@ -160,10 +160,11 @@ class HealthDataPoint {
         this.burnedCalories == o.burnedCalories &&
         this.workoutId == o.workoutId &&
         this.sourceId == o.sourceId &&
-        this.sourceName == o.sourceName;
+        this.sourceName == o.sourceName &&
+        this.workoutId == o.workoutId;
   }
 
   @override
   int get hashCode => Object.hash(value, unit, dateFrom, dateTo, type, platform,
-      deviceId, sourceId, sourceName, burnedCalories);
+      deviceId, sourceId, sourceName, burnedCalories, workoutId);
 }

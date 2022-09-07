@@ -329,6 +329,10 @@ let NUTRITION = "NUTRITION"
     }
 
     func writeAudiogram(call: FlutterMethodCall, result: @escaping FlutterResult) throws {
+        guard #available(iOS 13, *) else {
+            throw PluginError(message: "Invalid Arguments")
+        }
+
         guard let arguments = call.arguments as? NSDictionary,
               let frequencies = (arguments["frequencies"] as? [Double]),
               let leftEarSensitivities = (arguments["leftEarSensitivities"] as? [Double]),
@@ -668,33 +672,33 @@ var unit: HKUnit?
 DispatchQueue.main.async {
                     result(dictionaries)
                 }
-
-            case let (samplesAudiogram as [HKAudiogramSample]) as Any:
-                let dictionaries = samplesAudiogram.map { sample -> NSDictionary in
-                    var frequencies = [Double]()
-                    var leftEarSensitivities = [Double]()
-                    var rightEarSensitivities = [Double]()
-                    for samplePoint in sample.sensitivityPoints {
-                        frequencies.append(samplePoint.frequency.doubleValue(for: HKUnit.hertz()))
-                        leftEarSensitivities.append(
+            // TODO(amondnet): #available(iOS 13, *)
+            //case let (samplesAudiogram as [HKAudiogramSample]) as Any:
+            //    let dictionaries = samplesAudiogram.map { sample -> NSDictionary in
+            //        var frequencies = [Double]()
+            //        var leftEarSensitivities = [Double]()
+            //        var rightEarSensitivities = [Double]()
+            //        for samplePoint in sample.sensitivityPoints {
+            //            frequencies.append(samplePoint.frequency.doubleValue(for: HKUnit.hertz()))
+            //            leftEarSensitivities.append(
                             samplePoint.leftEarSensitivity!.doubleValue(for: HKUnit.decibelHearingLevel()))
-                        rightEarSensitivities.append(
+            //            rightEarSensitivities.append(
                             samplePoint.rightEarSensitivity!.doubleValue(for: HKUnit.decibelHearingLevel()))
-                    }
-                    return [
-                        "uuid": "\(sample.uuid)",
-                        "frequencies": frequencies,
-                        "leftEarSensitivities": leftEarSensitivities,
-                        "rightEarSensitivities": rightEarSensitivities,
-                        "date_from": Int(sample.startDate.timeIntervalSince1970 * 1000),
-                        "date_to": Int(sample.endDate.timeIntervalSince1970 * 1000),
-                        "source_id": sample.sourceRevision.source.bundleIdentifier,
-                        "source_name": sample.sourceRevision.source.name,
-                    ]
-                }
-                DispatchQueue.main.async {
-                    result(dictionaries)
-                }
+            //        }
+            //        return [
+            //            "uuid": "\(sample.uuid)",
+            //            "frequencies": frequencies,
+            //            "leftEarSensitivities": leftEarSensitivities,
+            //            "rightEarSensitivities": rightEarSensitivities,
+            //            "date_from": Int(sample.startDate.timeIntervalSince1970 * 1000),
+            //            "date_to": Int(sample.endDate.timeIntervalSince1970 * 1000),
+            //            "source_id": sample.sourceRevision.source.bundleIdentifier,
+            //            "source_name": sample.sourceRevision.source.name,
+            //        ]
+            //    }
+            //    DispatchQueue.main.async {
+            //        result(dictionaries)
+            //    }
 
             case let (nutritionSample as [HKCorrelation]) as Any:
 
@@ -877,7 +881,11 @@ DispatchQueue.main.async {
         unitDict[MILLIMETER_OF_MERCURY] = HKUnit.millimeterOfMercury()
         unitDict[CENTIMETER_OF_WATER] = HKUnit.centimeterOfWater()
         unitDict[ATMOSPHERE] = HKUnit.atmosphere()
-        unitDict[DECIBEL_A_WEIGHTED_SOUND_PRESSURE_LEVEL] = HKUnit.decibelAWeightedSoundPressureLevel()
+        if #available(iOS 13.0, *) {
+            unitDict[DECIBEL_A_WEIGHTED_SOUND_PRESSURE_LEVEL] = HKUnit.decibelAWeightedSoundPressureLevel()
+        } else {
+            // Fallback on earlier versions
+        }
         unitDict[SECOND] = HKUnit.second()
         unitDict[MILLISECOND] = HKUnit.secondUnit(with: .milli)
         unitDict[MINUTE] = HKUnit.minute()
@@ -885,15 +893,28 @@ DispatchQueue.main.async {
         unitDict[DAY] = HKUnit.day()
         unitDict[JOULE] = HKUnit.joule()
         unitDict[KILOCALORIE] = HKUnit.kilocalorie()
-        unitDict[LARGE_CALORIE] = HKUnit.largeCalorie()
-        unitDict[SMALL_CALORIE] = HKUnit.smallCalorie()
+        if #available(iOS 11.0, *) {
+            unitDict[LARGE_CALORIE] = HKUnit.largeCalorie()
+            unitDict[SMALL_CALORIE] = HKUnit.smallCalorie()
+            unitDict[SMALL_CALORIE] = HKUnit.smallCalorie()
+        } else {
+            // Fallback on earlier versions
+        }
+        if #available(iOS 13.0, *) {
+            unitDict[DECIBEL_HEARING_LEVEL] = HKUnit.decibelHearingLevel()
+            unitDict[INTERNATIONAL_UNIT] = HKUnit.internationalUnit()
+        } else {
+            // Fallback on earlier versions
+        }
         unitDict[DEGREE_CELSIUS] = HKUnit.degreeCelsius()
         unitDict[DEGREE_FAHRENHEIT] = HKUnit.degreeFahrenheit()
         unitDict[KELVIN] = HKUnit.kelvin()
-        unitDict[DECIBEL_HEARING_LEVEL] = HKUnit.decibelHearingLevel()
-        unitDict[HERTZ] = HKUnit.hertz()
+        if #available(iOS 13.0, *) {
+            unitDict[HERTZ] = HKUnit.hertz()
+        } else {
+            // Fallback on earlier versions
+        }
         unitDict[SIEMEN] = HKUnit.siemen()
-        unitDict[INTERNATIONAL_UNIT] = HKUnit.internationalUnit()
         unitDict[COUNT] = HKUnit.count()
         unitDict[PERCENT] = HKUnit.percent()
         unitDict[BEATS_PER_MINUTE] = HKUnit.init(from: "count/min")
@@ -913,7 +934,11 @@ DispatchQueue.main.async {
         workoutActivityTypeMap["BASEBALL"] = .baseball
         workoutActivityTypeMap["BASKETBALL"] = .basketball
         workoutActivityTypeMap["CRICKET"] = .cricket
-        workoutActivityTypeMap["DISC_SPORTS"] = .discSports
+        if #available(iOS 13.0, *) {
+            workoutActivityTypeMap["DISC_SPORTS"] = .discSports
+        } else {
+            // Fallback on earlier versions
+        }
         workoutActivityTypeMap["HANDBALL"] = .handball
         workoutActivityTypeMap["HOCKEY"] = .hockey
         workoutActivityTypeMap["LACROSSE"] = .lacrosse
@@ -922,32 +947,84 @@ DispatchQueue.main.async {
         workoutActivityTypeMap["SOFTBALL"] = .softball
         workoutActivityTypeMap["VOLLEYBALL"] = .volleyball
         workoutActivityTypeMap["PREPARATION_AND_RECOVERY"] = .preparationAndRecovery
-        workoutActivityTypeMap["FLEXIBILITY"] = .flexibility
+        if #available(iOS 10.0, *) {
+            workoutActivityTypeMap["FLEXIBILITY"] = .flexibility
+        } else {
+            // Fallback on earlier versions
+        }
         workoutActivityTypeMap["WALKING"] = .walking
         workoutActivityTypeMap["RUNNING"] = .running
         workoutActivityTypeMap["RUNNING_JOGGING"] = .running  // Supported due to combining with Android naming
         workoutActivityTypeMap["RUNNING_SAND"] = .running  // Supported due to combining with Android naming
         workoutActivityTypeMap["RUNNING_TREADMILL"] = .running  // Supported due to combining with Android naming
-        workoutActivityTypeMap["WHEELCHAIR_WALK_PACE"] = .wheelchairWalkPace
-        workoutActivityTypeMap["WHEELCHAIR_RUN_PACE"] = .wheelchairRunPace
+        if #available(iOS 10.0, *) {
+            workoutActivityTypeMap["WHEELCHAIR_WALK_PACE"] = .wheelchairWalkPace
+        } else {
+            // Fallback on earlier versions
+        }
+        if #available(iOS 10.0, *) {
+            workoutActivityTypeMap["WHEELCHAIR_RUN_PACE"] = .wheelchairRunPace
+        } else {
+            // Fallback on earlier versions
+        }
         workoutActivityTypeMap["BIKING"] = .cycling
-        workoutActivityTypeMap["HAND_CYCLING"] = .handCycling
-        workoutActivityTypeMap["CORE_TRAINING"] = .coreTraining
+        if #available(iOS 11.0, *) {
+            workoutActivityTypeMap["HAND_CYCLING"] = .handCycling
+        } else {
+            // Fallback on earlier versions
+        }
+        if #available(iOS 10.0, *) {
+            workoutActivityTypeMap["CORE_TRAINING"] = .coreTraining
+        } else {
+            // Fallback on earlier versions
+        }
         workoutActivityTypeMap["ELLIPTICAL"] = .elliptical
         workoutActivityTypeMap["FUNCTIONAL_STRENGTH_TRAINING"] = .functionalStrengthTraining
         workoutActivityTypeMap["TRADITIONAL_STRENGTH_TRAINING"] = .traditionalStrengthTraining
         workoutActivityTypeMap["CROSS_TRAINING"] = .crossTraining
-        workoutActivityTypeMap["MIXED_CARDIO"] = .mixedCardio
-        workoutActivityTypeMap["HIGH_INTENSITY_INTERVAL_TRAINING"] = .highIntensityIntervalTraining
-        workoutActivityTypeMap["JUMP_ROPE"] = .jumpRope
+        if #available(iOS 11.0, *) {
+            workoutActivityTypeMap["MIXED_CARDIO"] = .mixedCardio
+        } else {
+            // Fallback on earlier versions
+        }
+        if #available(iOS 10.0, *) {
+            workoutActivityTypeMap["HIGH_INTENSITY_INTERVAL_TRAINING"] = .highIntensityIntervalTraining
+        } else {
+            // Fallback on earlier versions
+        }
+        if #available(iOS 10.0, *) {
+            workoutActivityTypeMap["JUMP_ROPE"] = .jumpRope
+        } else {
+            // Fallback on earlier versions
+        }
         workoutActivityTypeMap["STAIR_CLIMBING"] = .stairClimbing
-        workoutActivityTypeMap["STAIRS"] = .stairs
-        workoutActivityTypeMap["STEP_TRAINING"] = .stepTraining
-        workoutActivityTypeMap["FITNESS_GAMING"] = .fitnessGaming
-        workoutActivityTypeMap["BARRE"] = .barre
+        if #available(iOS 10.0, *) {
+            workoutActivityTypeMap["STAIRS"] = .stairs
+        } else {
+            // Fallback on earlier versions
+        }
+        if #available(iOS 10.0, *) {
+            workoutActivityTypeMap["STEP_TRAINING"] = .stepTraining
+        } else {
+            // Fallback on earlier versions
+        }
+        if #available(iOS 13.0, *) {
+            workoutActivityTypeMap["FITNESS_GAMING"] = .fitnessGaming
+        } else {
+            // Fallback on earlier versions
+        }
+        if #available(iOS 10.0, *) {
+            workoutActivityTypeMap["BARRE"] = .barre
+        } else {
+            // Fallback on earlier versions
+        }
         workoutActivityTypeMap["YOGA"] = .yoga
         workoutActivityTypeMap["MIND_AND_BODY"] = .mindAndBody
-        workoutActivityTypeMap["PILATES"] = .pilates
+        if #available(iOS 10.0, *) {
+            workoutActivityTypeMap["PILATES"] = .pilates
+        } else {
+            // Fallback on earlier versions
+        }
         workoutActivityTypeMap["BADMINTON"] = .badminton
         workoutActivityTypeMap["RACQUETBALL"] = .racquetball
         workoutActivityTypeMap["SQUASH"] = .squash
@@ -961,11 +1038,23 @@ DispatchQueue.main.async {
         workoutActivityTypeMap["HIKING"] = .hiking
         workoutActivityTypeMap["HUNTING"] = .hunting
         workoutActivityTypeMap["PLAY"] = .play
-        workoutActivityTypeMap["CROSS_COUNTRY_SKIING"] = .crossCountrySkiing
+        if #available(iOS 10.0, *) {
+            workoutActivityTypeMap["CROSS_COUNTRY_SKIING"] = .crossCountrySkiing
+        } else {
+            // Fallback on earlier versions
+        }
         workoutActivityTypeMap["CURLING"] = .curling
-        workoutActivityTypeMap["DOWNHILL_SKIING"] = .downhillSkiing
+        if #available(iOS 10.0, *) {
+            workoutActivityTypeMap["DOWNHILL_SKIING"] = .downhillSkiing
+        } else {
+            // Fallback on earlier versions
+        }
         workoutActivityTypeMap["SNOW_SPORTS"] = .snowSports
-        workoutActivityTypeMap["SNOWBOARDING"] = .snowboarding
+        if #available(iOS 10.0, *) {
+            workoutActivityTypeMap["SNOWBOARDING"] = .snowboarding
+        } else {
+            // Fallback on earlier versions
+        }
         workoutActivityTypeMap["SKATING"] = .skatingSports
         workoutActivityTypeMap["SKATING_CROSS,"] = .skatingSports  // Supported due to combining with Android naming
         workoutActivityTypeMap["SKATING_INDOOR,"] = .skatingSports  // Supported due to combining with Android naming
@@ -979,9 +1068,17 @@ DispatchQueue.main.async {
         workoutActivityTypeMap["WATER_POLO"] = .waterPolo
         workoutActivityTypeMap["WATER_SPORTS"] = .waterSports
         workoutActivityTypeMap["BOXING"] = .boxing
-        workoutActivityTypeMap["KICKBOXING"] = .kickboxing
+        if #available(iOS 10.0, *) {
+            workoutActivityTypeMap["KICKBOXING"] = .kickboxing
+        } else {
+            // Fallback on earlier versions
+        }
         workoutActivityTypeMap["MARTIAL_ARTS"] = .martialArts
-        workoutActivityTypeMap["TAI_CHI"] = .taiChi
+        if #available(iOS 11.0, *) {
+            workoutActivityTypeMap["TAI_CHI"] = .taiChi
+        } else {
+            // Fallback on earlier versions
+        }
         workoutActivityTypeMap["WRESTLING"] = .wrestling
         workoutActivityTypeMap["OTHER"] = .other
 

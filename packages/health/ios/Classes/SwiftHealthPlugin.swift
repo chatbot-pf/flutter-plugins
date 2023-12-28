@@ -11,7 +11,7 @@ public class SwiftHealthPlugin: NSObject, FlutterPlugin {
     var allDataTypes = Set<HKSampleType>()
     var dataTypesDict: [String: HKSampleType] = [:]
     var unitDict: [String: HKUnit] = [:]
-    var workoutActivityTypeMap: [String: HKWorkoutActivityType] = [:]
+    let healthToHealthkitActivityMapping = HealthToHealthkitActivityMapping();
 
     // Health Data Type Keys
     let ACTIVE_ENERGY_BURNED = "ACTIVE_ENERGY_BURNED"
@@ -482,7 +482,7 @@ let NUTRITION = "NUTRITION"
               let activityType = (arguments["activityType"] as? String),
               let startTime = (arguments["startTime"] as? NSNumber),
               let endTime = (arguments["endTime"] as? NSNumber),
-              let ac = workoutActivityTypeMap[activityType]
+              let ac = healthToHealthkitActivityMapping.toHealthkitActivityType(healthActivityType: activityType)
         else {
             throw PluginError(message: "Invalid Arguments - activityType, startTime or endTime invalid")
         }
@@ -654,9 +654,7 @@ var unit: HKUnit?
                 let dictionaries = samplesWorkout.map { sample -> NSDictionary in
                     return [
                         "uuid": "\(sample.uuid)",
-                        "workoutActivityType": workoutActivityTypeMap.first(where: {
-                            $0.value == sample.workoutActivityType
-                        })?.key,
+                        "workoutActivityType": "\(healthToHealthkitActivityMapping.toHealthActivityType(hkActivityType: sample.workoutActivityType))",
                         "totalEnergyBurned": sample.totalEnergyBurned?.doubleValue(for: HKUnit.kilocalorie()),
                         "totalEnergyBurnedUnit": "KILOCALORIE",
                         "totalDistance": sample.totalDistance?.doubleValue(for: HKUnit.meter()),
@@ -923,166 +921,6 @@ DispatchQueue.main.async {
         unitDict[UNKNOWN_UNIT] = HKUnit.init(from: "")
         unitDict[NO_UNIT] = HKUnit.init(from: "")
 
-        // Initialize workout types
-        workoutActivityTypeMap["ARCHERY"] = .archery
-        workoutActivityTypeMap["BOWLING"] = .bowling
-        workoutActivityTypeMap["FENCING"] = .fencing
-        workoutActivityTypeMap["GYMNASTICS"] = .gymnastics
-        workoutActivityTypeMap["TRACK_AND_FIELD"] = .trackAndField
-        workoutActivityTypeMap["AMERICAN_FOOTBALL"] = .americanFootball
-        workoutActivityTypeMap["AUSTRALIAN_FOOTBALL"] = .australianFootball
-        workoutActivityTypeMap["BASEBALL"] = .baseball
-        workoutActivityTypeMap["BASKETBALL"] = .basketball
-        workoutActivityTypeMap["CRICKET"] = .cricket
-        if #available(iOS 13.0, *) {
-            workoutActivityTypeMap["DISC_SPORTS"] = .discSports
-        } else {
-            // Fallback on earlier versions
-        }
-        workoutActivityTypeMap["HANDBALL"] = .handball
-        workoutActivityTypeMap["HOCKEY"] = .hockey
-        workoutActivityTypeMap["LACROSSE"] = .lacrosse
-        workoutActivityTypeMap["RUGBY"] = .rugby
-        workoutActivityTypeMap["SOCCER"] = .soccer
-        workoutActivityTypeMap["SOFTBALL"] = .softball
-        workoutActivityTypeMap["VOLLEYBALL"] = .volleyball
-        workoutActivityTypeMap["PREPARATION_AND_RECOVERY"] = .preparationAndRecovery
-        if #available(iOS 10.0, *) {
-            workoutActivityTypeMap["FLEXIBILITY"] = .flexibility
-        } else {
-            // Fallback on earlier versions
-        }
-        workoutActivityTypeMap["WALKING"] = .walking
-        workoutActivityTypeMap["RUNNING"] = .running
-        workoutActivityTypeMap["RUNNING_JOGGING"] = .running  // Supported due to combining with Android naming
-        workoutActivityTypeMap["RUNNING_SAND"] = .running  // Supported due to combining with Android naming
-        workoutActivityTypeMap["RUNNING_TREADMILL"] = .running  // Supported due to combining with Android naming
-        if #available(iOS 10.0, *) {
-            workoutActivityTypeMap["WHEELCHAIR_WALK_PACE"] = .wheelchairWalkPace
-        } else {
-            // Fallback on earlier versions
-        }
-        if #available(iOS 10.0, *) {
-            workoutActivityTypeMap["WHEELCHAIR_RUN_PACE"] = .wheelchairRunPace
-        } else {
-            // Fallback on earlier versions
-        }
-        workoutActivityTypeMap["BIKING"] = .cycling
-        if #available(iOS 11.0, *) {
-            workoutActivityTypeMap["HAND_CYCLING"] = .handCycling
-        } else {
-            // Fallback on earlier versions
-        }
-        if #available(iOS 10.0, *) {
-            workoutActivityTypeMap["CORE_TRAINING"] = .coreTraining
-        } else {
-            // Fallback on earlier versions
-        }
-        workoutActivityTypeMap["ELLIPTICAL"] = .elliptical
-        workoutActivityTypeMap["FUNCTIONAL_STRENGTH_TRAINING"] = .functionalStrengthTraining
-        workoutActivityTypeMap["TRADITIONAL_STRENGTH_TRAINING"] = .traditionalStrengthTraining
-        workoutActivityTypeMap["CROSS_TRAINING"] = .crossTraining
-        if #available(iOS 11.0, *) {
-            workoutActivityTypeMap["MIXED_CARDIO"] = .mixedCardio
-        } else {
-            // Fallback on earlier versions
-        }
-        if #available(iOS 10.0, *) {
-            workoutActivityTypeMap["HIGH_INTENSITY_INTERVAL_TRAINING"] = .highIntensityIntervalTraining
-        } else {
-            // Fallback on earlier versions
-        }
-        if #available(iOS 10.0, *) {
-            workoutActivityTypeMap["JUMP_ROPE"] = .jumpRope
-        } else {
-            // Fallback on earlier versions
-        }
-        workoutActivityTypeMap["STAIR_CLIMBING"] = .stairClimbing
-        if #available(iOS 10.0, *) {
-            workoutActivityTypeMap["STAIRS"] = .stairs
-        } else {
-            // Fallback on earlier versions
-        }
-        if #available(iOS 10.0, *) {
-            workoutActivityTypeMap["STEP_TRAINING"] = .stepTraining
-        } else {
-            // Fallback on earlier versions
-        }
-        if #available(iOS 13.0, *) {
-            workoutActivityTypeMap["FITNESS_GAMING"] = .fitnessGaming
-        } else {
-            // Fallback on earlier versions
-        }
-        if #available(iOS 10.0, *) {
-            workoutActivityTypeMap["BARRE"] = .barre
-        } else {
-            // Fallback on earlier versions
-        }
-        workoutActivityTypeMap["YOGA"] = .yoga
-        workoutActivityTypeMap["MIND_AND_BODY"] = .mindAndBody
-        if #available(iOS 10.0, *) {
-            workoutActivityTypeMap["PILATES"] = .pilates
-        } else {
-            // Fallback on earlier versions
-        }
-        workoutActivityTypeMap["BADMINTON"] = .badminton
-        workoutActivityTypeMap["RACQUETBALL"] = .racquetball
-        workoutActivityTypeMap["SQUASH"] = .squash
-        workoutActivityTypeMap["TABLE_TENNIS"] = .tableTennis
-        workoutActivityTypeMap["TENNIS"] = .tennis
-        workoutActivityTypeMap["CLIMBING"] = .climbing
-        workoutActivityTypeMap["ROCK_CLIMBING"] = .climbing  // Supported due to combining with Android naming
-        workoutActivityTypeMap["EQUESTRIAN_SPORTS"] = .equestrianSports
-        workoutActivityTypeMap["FISHING"] = .fishing
-        workoutActivityTypeMap["GOLF"] = .golf
-        workoutActivityTypeMap["HIKING"] = .hiking
-        workoutActivityTypeMap["HUNTING"] = .hunting
-        workoutActivityTypeMap["PLAY"] = .play
-        if #available(iOS 10.0, *) {
-            workoutActivityTypeMap["CROSS_COUNTRY_SKIING"] = .crossCountrySkiing
-        } else {
-            // Fallback on earlier versions
-        }
-        workoutActivityTypeMap["CURLING"] = .curling
-        if #available(iOS 10.0, *) {
-            workoutActivityTypeMap["DOWNHILL_SKIING"] = .downhillSkiing
-        } else {
-            // Fallback on earlier versions
-        }
-        workoutActivityTypeMap["SNOW_SPORTS"] = .snowSports
-        if #available(iOS 10.0, *) {
-            workoutActivityTypeMap["SNOWBOARDING"] = .snowboarding
-        } else {
-            // Fallback on earlier versions
-        }
-        workoutActivityTypeMap["SKATING"] = .skatingSports
-        workoutActivityTypeMap["SKATING_CROSS,"] = .skatingSports  // Supported due to combining with Android naming
-        workoutActivityTypeMap["SKATING_INDOOR,"] = .skatingSports  // Supported due to combining with Android naming
-        workoutActivityTypeMap["SKATING_INLINE,"] = .skatingSports  // Supported due to combining with Android naming
-        workoutActivityTypeMap["PADDLE_SPORTS"] = .paddleSports
-        workoutActivityTypeMap["ROWING"] = .rowing
-        workoutActivityTypeMap["SAILING"] = .sailing
-        workoutActivityTypeMap["SURFING_SPORTS"] = .surfingSports
-        workoutActivityTypeMap["SWIMMING"] = .swimming
-        workoutActivityTypeMap["WATER_FITNESS"] = .waterFitness
-        workoutActivityTypeMap["WATER_POLO"] = .waterPolo
-        workoutActivityTypeMap["WATER_SPORTS"] = .waterSports
-        workoutActivityTypeMap["BOXING"] = .boxing
-        if #available(iOS 10.0, *) {
-            workoutActivityTypeMap["KICKBOXING"] = .kickboxing
-        } else {
-            // Fallback on earlier versions
-        }
-        workoutActivityTypeMap["MARTIAL_ARTS"] = .martialArts
-        if #available(iOS 11.0, *) {
-            workoutActivityTypeMap["TAI_CHI"] = .taiChi
-        } else {
-            // Fallback on earlier versions
-        }
-        workoutActivityTypeMap["WRESTLING"] = .wrestling
-        workoutActivityTypeMap["OTHER"] = .other
-
-
         // Set up iOS 13 specific types (ordinary health data types)
         if #available(iOS 13.0, *) {
             dataTypesDict[ACTIVE_ENERGY_BURNED] = HKSampleType.quantityType(
@@ -1178,11 +1016,6 @@ dataTypesDict[NUTRITION] = HKSampleType.correlationType(
 
             unitDict[VOLT] = HKUnit.volt()
             unitDict[INCHES_OF_MERCURY] = HKUnit.inchesOfMercury()
-
-            workoutActivityTypeMap["CARDIO_DANCE"] = HKWorkoutActivityType.cardioDance
-            workoutActivityTypeMap["SOCIAL_DANCE"] = HKWorkoutActivityType.socialDance
-            workoutActivityTypeMap["PICKLEBALL"] = HKWorkoutActivityType.pickleball
-            workoutActivityTypeMap["COOLDOWN"] = HKWorkoutActivityType.cooldown
         }
 
         // Concatenate heart events, headache and health data types (both may be empty)

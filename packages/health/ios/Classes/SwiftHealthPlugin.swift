@@ -679,9 +679,9 @@ DispatchQueue.main.async {
             //        for samplePoint in sample.sensitivityPoints {
             //            frequencies.append(samplePoint.frequency.doubleValue(for: HKUnit.hertz()))
             //            leftEarSensitivities.append(
-                            samplePoint.leftEarSensitivity!.doubleValue(for: HKUnit.decibelHearingLevel()))
+            //                samplePoint.leftEarSensitivity!.doubleValue(for: HKUnit.decibelHearingLevel()))
             //            rightEarSensitivities.append(
-                            samplePoint.rightEarSensitivity!.doubleValue(for: HKUnit.decibelHearingLevel()))
+            //                samplePoint.rightEarSensitivity!.doubleValue(for: HKUnit.decibelHearingLevel()))
             //        }
             //        return [
             //            "uuid": "\(sample.uuid)",

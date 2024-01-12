@@ -167,7 +167,6 @@ class HealthToHealthkitActivityMapping {
         healthActivityTypeToHealthkit[.BASEBALL] = .baseball
         healthActivityTypeToHealthkit[.BASKETBALL] = .basketball
         healthActivityTypeToHealthkit[.CRICKET] = .cricket
-        healthActivityTypeToHealthkit[.DISC_SPORTS] = .discSports
         healthActivityTypeToHealthkit[.HANDBALL] = .handball
         healthActivityTypeToHealthkit[.HOCKEY] = .hockey
         healthActivityTypeToHealthkit[.LACROSSE] = .lacrosse
@@ -176,32 +175,19 @@ class HealthToHealthkitActivityMapping {
         healthActivityTypeToHealthkit[.SOFTBALL] = .softball
         healthActivityTypeToHealthkit[.VOLLEYBALL] = .volleyball
         healthActivityTypeToHealthkit[.PREPARATION_AND_RECOVERY] = .preparationAndRecovery
-        healthActivityTypeToHealthkit[.FLEXIBILITY] = .flexibility
         healthActivityTypeToHealthkit[.WALKING] = .walking
         healthActivityTypeToHealthkit[.RUNNING] = .running
         healthActivityTypeToHealthkit[.RUNNING_JOGGING] = .running // Supported due to combining with Android naming
         healthActivityTypeToHealthkit[.RUNNING_SAND] = .running // Supported due to combining with Android naming
         healthActivityTypeToHealthkit[.RUNNING_TREADMILL] = .running // Supported due to combining with Android naming
-        healthActivityTypeToHealthkit[.WHEELCHAIR_WALK_PACE] = .wheelchairWalkPace
-        healthActivityTypeToHealthkit[.WHEELCHAIR_RUN_PACE] = .wheelchairRunPace
         healthActivityTypeToHealthkit[.BIKING] = .cycling
-        healthActivityTypeToHealthkit[.HAND_CYCLING] = .handCycling
-        healthActivityTypeToHealthkit[.CORE_TRAINING] = .coreTraining
         healthActivityTypeToHealthkit[.ELLIPTICAL] = .elliptical
         healthActivityTypeToHealthkit[.FUNCTIONAL_STRENGTH_TRAINING] = .functionalStrengthTraining
         healthActivityTypeToHealthkit[.TRADITIONAL_STRENGTH_TRAINING] = .traditionalStrengthTraining
         healthActivityTypeToHealthkit[.CROSS_TRAINING] = .crossTraining
-        healthActivityTypeToHealthkit[.MIXED_CARDIO] = .mixedCardio
-        healthActivityTypeToHealthkit[.HIGH_INTENSITY_INTERVAL_TRAINING] = .highIntensityIntervalTraining
-        healthActivityTypeToHealthkit[.JUMP_ROPE] = .jumpRope
         healthActivityTypeToHealthkit[.STAIR_CLIMBING] = .stairClimbing
-        healthActivityTypeToHealthkit[.STAIRS] = .stairs
-        healthActivityTypeToHealthkit[.STEP_TRAINING] = .stepTraining
-        healthActivityTypeToHealthkit[.FITNESS_GAMING] = .fitnessGaming
-        healthActivityTypeToHealthkit[.BARRE] = .barre
         healthActivityTypeToHealthkit[.YOGA] = .yoga
         healthActivityTypeToHealthkit[.MIND_AND_BODY] = .mindAndBody
-        healthActivityTypeToHealthkit[.PILATES] = .pilates
         healthActivityTypeToHealthkit[.BADMINTON] = .badminton
         healthActivityTypeToHealthkit[.RACQUETBALL] = .racquetball
         healthActivityTypeToHealthkit[.SQUASH] = .squash
@@ -215,11 +201,8 @@ class HealthToHealthkitActivityMapping {
         healthActivityTypeToHealthkit[.HIKING] = .hiking
         healthActivityTypeToHealthkit[.HUNTING] = .hunting
         healthActivityTypeToHealthkit[.PLAY] = .play
-        healthActivityTypeToHealthkit[.CROSS_COUNTRY_SKIING] = .crossCountrySkiing
         healthActivityTypeToHealthkit[.CURLING] = .curling
-        healthActivityTypeToHealthkit[.DOWNHILL_SKIING] = .downhillSkiing
         healthActivityTypeToHealthkit[.SNOW_SPORTS] = .snowSports
-        healthActivityTypeToHealthkit[.SNOWBOARDING] = .snowboarding
         healthActivityTypeToHealthkit[.SKATING] = .skatingSports
         healthActivityTypeToHealthkit[.SKATING_CROSS] = .skatingSports // Supported due to combining with Android naming
         healthActivityTypeToHealthkit[.SKATING_INDOOR] = .skatingSports // Supported due to combining with Android naming
@@ -233,12 +216,9 @@ class HealthToHealthkitActivityMapping {
         healthActivityTypeToHealthkit[.WATER_POLO] = .waterPolo
         healthActivityTypeToHealthkit[.WATER_SPORTS] = .waterSports
         healthActivityTypeToHealthkit[.BOXING] = .boxing
-        healthActivityTypeToHealthkit[.KICKBOXING] = .kickboxing
         healthActivityTypeToHealthkit[.MARTIAL_ARTS] = .martialArts
-        healthActivityTypeToHealthkit[.TAI_CHI] = .taiChi
         healthActivityTypeToHealthkit[.WRESTLING] = .wrestling
         healthActivityTypeToHealthkit[.OTHER] = .other
-
         healthkitTypeToHealth[.archery] = .ARCHERY
         healthkitTypeToHealth[.bowling] = .BOWLING
         healthkitTypeToHealth[.fencing] = .FENCING
@@ -249,7 +229,6 @@ class HealthToHealthkitActivityMapping {
         healthkitTypeToHealth[.baseball] = .BASEBALL
         healthkitTypeToHealth[.basketball] = .BASKETBALL
         healthkitTypeToHealth[.cricket] = .CRICKET
-        healthkitTypeToHealth[.discSports] = .DISC_SPORTS
         healthkitTypeToHealth[.handball] = .HANDBALL
         healthkitTypeToHealth[.hockey] = .HOCKEY
         healthkitTypeToHealth[.lacrosse] = .LACROSSE
@@ -258,29 +237,18 @@ class HealthToHealthkitActivityMapping {
         healthkitTypeToHealth[.softball] = .SOFTBALL
         healthkitTypeToHealth[.volleyball] = .VOLLEYBALL
         healthkitTypeToHealth[.preparationAndRecovery] = .PREPARATION_AND_RECOVERY
-        healthkitTypeToHealth[.flexibility] = .FLEXIBILITY
         healthkitTypeToHealth[.walking] = .WALKING
         healthkitTypeToHealth[.running] = .RUNNING
-        healthkitTypeToHealth[.wheelchairWalkPace] = .WHEELCHAIR_WALK_PACE
-        healthkitTypeToHealth[.wheelchairRunPace] = .WHEELCHAIR_RUN_PACE
         healthkitTypeToHealth[.cycling] = .BIKING
         healthkitTypeToHealth[.handCycling] = .HAND_CYCLING
-        healthkitTypeToHealth[.coreTraining] = .CORE_TRAINING
         healthkitTypeToHealth[.elliptical] = .ELLIPTICAL
         healthkitTypeToHealth[.functionalStrengthTraining] = .FUNCTIONAL_STRENGTH_TRAINING
         healthkitTypeToHealth[.traditionalStrengthTraining] = .TRADITIONAL_STRENGTH_TRAINING
         healthkitTypeToHealth[.crossTraining] = .CROSS_TRAINING
         healthkitTypeToHealth[.mixedCardio] = .MIXED_CARDIO
-        healthkitTypeToHealth[.highIntensityIntervalTraining] = .HIGH_INTENSITY_INTERVAL_TRAINING
-        healthkitTypeToHealth[.jumpRope] = .JUMP_ROPE
         healthkitTypeToHealth[.stairClimbing] = .STAIR_CLIMBING
-        healthkitTypeToHealth[.stairs] = .STAIRS
-        healthkitTypeToHealth[.stepTraining] = .STEP_TRAINING
-        healthkitTypeToHealth[.fitnessGaming] = .FITNESS_GAMING
-        healthkitTypeToHealth[.barre] = .BARRE
         healthkitTypeToHealth[.yoga] = .YOGA
         healthkitTypeToHealth[.mindAndBody] = .MIND_AND_BODY
-        healthkitTypeToHealth[.pilates] = .PILATES
         healthkitTypeToHealth[.badminton] = .BADMINTON
         healthkitTypeToHealth[.racquetball] = .RACQUETBALL
         healthkitTypeToHealth[.squash] = .SQUASH
@@ -293,11 +261,8 @@ class HealthToHealthkitActivityMapping {
         healthkitTypeToHealth[.hiking] = .HIKING
         healthkitTypeToHealth[.hunting] = .HUNTING
         healthkitTypeToHealth[.play] = .PLAY
-        healthkitTypeToHealth[.crossCountrySkiing] = .CROSS_COUNTRY_SKIING
         healthkitTypeToHealth[.curling] = .CURLING
-        healthkitTypeToHealth[.downhillSkiing] = .DOWNHILL_SKIING
         healthkitTypeToHealth[.snowSports] = .SNOW_SPORTS
-        healthkitTypeToHealth[.snowboarding] = .SNOWBOARDING
         healthkitTypeToHealth[.skatingSports] = .SKATING
         healthkitTypeToHealth[.paddleSports] = .PADDLE_SPORTS
         healthkitTypeToHealth[.rowing] = .ROWING
@@ -308,11 +273,58 @@ class HealthToHealthkitActivityMapping {
         healthkitTypeToHealth[.waterPolo] = .WATER_POLO
         healthkitTypeToHealth[.waterSports] = .WATER_SPORTS
         healthkitTypeToHealth[.boxing] = .BOXING
-        healthkitTypeToHealth[.kickboxing] = .KICKBOXING
         healthkitTypeToHealth[.martialArts] = .MARTIAL_ARTS
         healthkitTypeToHealth[.taiChi] = .TAI_CHI
         healthkitTypeToHealth[.wrestling] = .WRESTLING
         healthkitTypeToHealth[.other] = .OTHER
+
+      if #available(iOS 10.0, *) {
+          healthkitTypeToHealth[.coreTraining] = .CORE_TRAINING
+          healthkitTypeToHealth[.downhillSkiing] = .DOWNHILL_SKIING
+          healthkitTypeToHealth[.flexibility] = .FLEXIBILITY
+          healthkitTypeToHealth[.snowboarding] = .SNOWBOARDING
+          healthkitTypeToHealth[.kickboxing] = .KICKBOXING
+          healthkitTypeToHealth[.pilates] = .PILATES
+          healthkitTypeToHealth[.crossCountrySkiing] = .CROSS_COUNTRY_SKIING
+          healthkitTypeToHealth[.barre] = .BARRE
+          healthkitTypeToHealth[.stepTraining] = .STEP_TRAINING
+          healthkitTypeToHealth[.stairs] = .STAIRS
+          healthkitTypeToHealth[.jumpRope] = .JUMP_ROPE
+          healthkitTypeToHealth[.highIntensityIntervalTraining] = .HIGH_INTENSITY_INTERVAL_TRAINING
+          healthkitTypeToHealth[.wheelchairWalkPace] = .WHEELCHAIR_WALK_PACE
+          healthkitTypeToHealth[.wheelchairRunPace] = .WHEELCHAIR_RUN_PACE
+
+
+          healthActivityTypeToHealthkit[.CORE_TRAINING] = .coreTraining
+          healthActivityTypeToHealthkit[.DOWNHILL_SKIING] = .downhillSkiing
+          healthActivityTypeToHealthkit[.FLEXIBILITY] = .flexibility
+          healthActivityTypeToHealthkit[.SNOWBOARDING] = .snowboarding
+          healthActivityTypeToHealthkit[.KICKBOXING] = .kickboxing
+          healthActivityTypeToHealthkit[.PILATES] = .pilates
+          healthActivityTypeToHealthkit[.CROSS_COUNTRY_SKIING] = .crossCountrySkiing
+          healthActivityTypeToHealthkit[.BARRE] = .barre
+          healthActivityTypeToHealthkit[.STEP_TRAINING] = .stepTraining
+          healthActivityTypeToHealthkit[.STAIRS] = .stairs
+          healthActivityTypeToHealthkit[.JUMP_ROPE] = .jumpRope
+          healthActivityTypeToHealthkit[.HIGH_INTENSITY_INTERVAL_TRAINING] = .highIntensityIntervalTraining
+          healthActivityTypeToHealthkit[.WHEELCHAIR_WALK_PACE] = .wheelchairWalkPace
+          healthActivityTypeToHealthkit[.WHEELCHAIR_RUN_PACE] = .wheelchairRunPace
+      }
+
+      if #available(iOS 11.0, *) {
+          healthActivityTypeToHealthkit[.TAI_CHI] = .taiChi
+          healthActivityTypeToHealthkit[.MIXED_CARDIO] = .mixedCardio
+          healthActivityTypeToHealthkit[.HAND_CYCLING] = .handCycling
+
+      }
+
+      if #available(iOS 13.0, *) {
+          healthActivityTypeToHealthkit[.DISC_SPORTS] = .discSports
+          healthActivityTypeToHealthkit[.FITNESS_GAMING] = .fitnessGaming
+
+          healthkitTypeToHealth[.discSports] = .DISC_SPORTS
+          healthkitTypeToHealth[.fitnessGaming] = .FITNESS_GAMING
+      }
 
       if #available(iOS 14.0, *) {
           healthActivityTypeToHealthkit[.CARDIO_DANCE] = HKWorkoutActivityType.cardioDance

@@ -1777,15 +1777,21 @@ class HealthPlugin(private var channel: MethodChannel? = null) :
                         )
                     }
                     // Filter sleep stages for requested stage
-                } else if (classType == SleepStageRecord::class) {
+                }
+
+                /*else if (classType == SleepSessionRecord::class) {
                     for (rec in response.records) {
-                        if (rec is SleepStageRecord) {
-                            if (dataType == MapSleepStageToType[rec.stage]) {
-                                healthConnectData.addAll(convertRecord(rec, dataType))
+                        if (rec is SleepSessionRecord) {
+                            if ( dataType == "")
+                            for ( stage in rec.stages ) {
+                                if (dataType == MapSleepStageToType[stage.stage]) {
+                                    healthConnectData.addAll(convertRecord(rec, dataType))
+                                }
                             }
                         }
                     }
-                } else {
+                } */
+                else {
                     for (rec in response.records) {
                         healthConnectData.addAll(convertRecord(rec, dataType))
                     }
@@ -1921,17 +1927,14 @@ class HealthPlugin(private var channel: MethodChannel? = null) :
 
             is SleepSessionRecord -> return listOf(
                 mapOf<String, Any>(
-                    "date_from" to record.startTime.toEpochMilli(),
-                    "date_to" to record.endTime.toEpochMilli(),
-                    "value" to ChronoUnit.MINUTES.between(record.startTime, record.endTime),
-                    "source_id" to "",
-                    "source_name" to metadata.dataOrigin.packageName,
-                ),
-            )
-
-            is SleepStageRecord -> return listOf(
-                mapOf<String, Any>(
-                    "stage" to record.stage,
+                    "stages" to record.stages.map { mapOf(
+                            "stage" to it.stage,
+                            "date_from" to it.startTime.toEpochMilli(),
+                            "date_to" to it.endTime.toEpochMilli(),
+                            "source_id" to "",
+                            "source_name" to metadata.dataOrigin.packageName,
+                            "value" to ChronoUnit.MINUTES.between(it.startTime, it.endTime),
+                        ) },
                     "value" to ChronoUnit.MINUTES.between(record.startTime, record.endTime),
                     "date_from" to record.startTime.toEpochMilli(),
                     "date_to" to record.endTime.toEpochMilli(),
@@ -2089,54 +2092,54 @@ class HealthPlugin(private var channel: MethodChannel? = null) :
                 startZoneOffset = null,
                 endZoneOffset = null,
             )
-
-            SLEEP_ASLEEP -> SleepStageRecord(
+            /*
+            SLEEP_ASLEEP -> SleepSessionRecord(
                 startTime = Instant.ofEpochMilli(startTime),
                 endTime = Instant.ofEpochMilli(endTime),
                 startZoneOffset = null,
                 endZoneOffset = null,
-                stage = SleepStageRecord.STAGE_TYPE_SLEEPING,
+                stages = listOf(SleepSessionRecord.Stage(Instant.ofEpochMilli(startTime), Instant.ofEpochMilli(endTime), SleepSessionRecord.STAGE_TYPE_SLEEPING)),
             )
 
-            SLEEP_LIGHT -> SleepStageRecord(
+            SLEEP_LIGHT -> SleepSessionRecord(
                 startTime = Instant.ofEpochMilli(startTime),
                 endTime = Instant.ofEpochMilli(endTime),
                 startZoneOffset = null,
                 endZoneOffset = null,
-                stage = SleepStageRecord.STAGE_TYPE_LIGHT,
-            )
+                    stages = listOf(SleepSessionRecord.Stage(Instant.ofEpochMilli(startTime), Instant.ofEpochMilli(endTime), SleepSessionRecord.STAGE_TYPE_LIGHT)), )
 
-            SLEEP_DEEP -> SleepStageRecord(
+            SLEEP_DEEP -> SleepSessionRecord(
                 startTime = Instant.ofEpochMilli(startTime),
                 endTime = Instant.ofEpochMilli(endTime),
                 startZoneOffset = null,
                 endZoneOffset = null,
-                stage = SleepStageRecord.STAGE_TYPE_DEEP,
+                    stages = listOf(SleepSessionRecord.Stage(Instant.ofEpochMilli(startTime), Instant.ofEpochMilli(endTime), SleepSessionRecord.STAGE_TYPE_DEEP)),
+
             )
 
-            SLEEP_REM -> SleepStageRecord(
+            SLEEP_REM -> SleepSessionRecord(
                 startTime = Instant.ofEpochMilli(startTime),
                 endTime = Instant.ofEpochMilli(endTime),
                 startZoneOffset = null,
                 endZoneOffset = null,
-                stage = SleepStageRecord.STAGE_TYPE_REM,
-            )
+                    stages = listOf(SleepSessionRecord.Stage(Instant.ofEpochMilli(startTime), Instant.ofEpochMilli(endTime), SleepSessionRecord.STAGE_TYPE_REM)),
+                )
 
-            SLEEP_OUT_OF_BED -> SleepStageRecord(
+            SLEEP_OUT_OF_BED -> SleepSessionRecord(
                 startTime = Instant.ofEpochMilli(startTime),
                 endTime = Instant.ofEpochMilli(endTime),
                 startZoneOffset = null,
                 endZoneOffset = null,
-                stage = SleepStageRecord.STAGE_TYPE_OUT_OF_BED,
-            )
+                    stages = listOf(SleepSessionRecord.Stage(Instant.ofEpochMilli(startTime), Instant.ofEpochMilli(endTime), SleepSessionRecord.STAGE_TYPE_OUT_OF_BED)),
+                    )
 
-            SLEEP_AWAKE -> SleepStageRecord(
+            SLEEP_AWAKE -> SleepSessionRecord(
                 startTime = Instant.ofEpochMilli(startTime),
                 endTime = Instant.ofEpochMilli(endTime),
                 startZoneOffset = null,
                 endZoneOffset = null,
-                stage = SleepStageRecord.STAGE_TYPE_AWAKE,
-            )
+                stages = listOf(SleepSessionRecord.Stage(Instant.ofEpochMilli(startTime), Instant.ofEpochMilli(endTime), SleepSessionRecord.STAGE_TYPE_AWAKE)),
+            )*/
 
 
             SLEEP_SESSION -> SleepSessionRecord(
@@ -2350,12 +2353,12 @@ class HealthPlugin(private var channel: MethodChannel? = null) :
         BLOOD_GLUCOSE to BloodGlucoseRecord::class,
         DISTANCE_DELTA to DistanceRecord::class,
         WATER to HydrationRecord::class,
-        SLEEP_ASLEEP to SleepStageRecord::class,
-        SLEEP_AWAKE to SleepStageRecord::class,
-        SLEEP_LIGHT to SleepStageRecord::class,
-        SLEEP_DEEP to SleepStageRecord::class,
-        SLEEP_REM to SleepStageRecord::class,
-        SLEEP_OUT_OF_BED to SleepStageRecord::class,
+        // SLEEP_ASLEEP to SleepSessionRecord::class,
+        // SLEEP_AWAKE to SleepSessionRecord::class,
+        // SLEEP_LIGHT to SleepSessionRecord::class,
+        // SLEEP_DEEP to SleepSessionRecord::class,
+        // SLEEP_REM to SleepSessionRecord::class,
+        // SLEEP_OUT_OF_BED to SleepSessionRecord::class,
         SLEEP_SESSION to SleepSessionRecord::class,
         WORKOUT to ExerciseSessionRecord::class,
         NUTRITION to NutritionRecord::class,
